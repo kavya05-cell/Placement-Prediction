@@ -23,7 +23,7 @@ iq = st.slider('IQ Score', min_value=50, max_value=150, value=100, step=1)
 if st.button('Predict Placement'):
     # Prepare the input data for the model with BOTH features
     # Make sure the column names match the features the model was trained on
-    input_data = pd.DataFrame([[cgpa, iq]], columns=['CGPA', 'IQ Score']) 
+    input_data = pd.DataFrame([[cgpa, iq]], columns=['cgpa', 'iq']) 
 
     # Make a prediction
     prediction = model.predict(input_data)[0]
@@ -34,4 +34,5 @@ if st.button('Predict Placement'):
         st.success('Congratulations! The student is likely to be placed.')
     else:
         st.warning('The student is likely to be not placed. Consider further training.')
+
 
