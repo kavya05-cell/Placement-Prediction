@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 import joblib
 import pandas as pd
@@ -15,26 +14,24 @@ st.title('Student Placement Predictor')
 st.write('Enter the student details to predict their placement status.')
 
 # Create input widgets for your model's features
-# Customize these to match the features your model was trained on
+# We now know the model expects two features: 'CGPA' and 'IQ'
 st.header('Student Details')
 cgpa = st.slider('CGPA', min_value=0.0, max_value=10.0, value=7.5, step=0.1)
-# Add more input widgets for other features, e.g., 'skills', 'interviews', etc.
-# skills = st.selectbox('Skills', ['Python', 'Java', 'Data Science', 'None'])
-# communication_score = st.number_input('Communication Score', min_value=0, max_value=100)
+iq = st.slider('IQ Score', min_value=50, max_value=150, value=100, step=1)
 
 # Create a button to trigger the prediction
 if st.button('Predict Placement'):
-    # Prepare the input data for the model
-    # The data must be in the same format as the training data
-    input_data = pd.DataFrame([[cgpa]], columns=['CGPA']) # Replace with your actual feature names
+    # Prepare the input data for the model with BOTH features
+    # Make sure the column names match the features the model was trained on
+    input_data = pd.DataFrame([[cgpa, iq]], columns=['CGPA', 'IQ Score']) 
 
     # Make a prediction
     prediction = model.predict(input_data)[0]
 
     # Display the result
     st.subheader('Prediction Result')
-    if prediction == 1: # Assuming 1 = Placed
+    if prediction == 1:
         st.success('Congratulations! The student is likely to be placed.')
-        
-    else: # Assuming 0 = Not Placed
+    else:
         st.warning('The student is likely to be not placed. Consider further training.')
+
