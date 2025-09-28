@@ -1,39 +1,40 @@
 # app.py
-from flask import Flask, render_template, request, jsonify
+import streamlit as st
 import joblib
+import pandas as pd
 
-app = Flask(__name__)
+# Load your pre-trained model (update the path as needed)
+try:
+    model = joblib.load('placement-prediction-model.pkl')
+except FileNotFoundError:
+    st.error("Model file not found. Please place your model in the 'models' directory.")
+    st.stop()
 
-# Load your pre-trained model (update the path to your model file)
-# The `joblib` library is great for saving and loading scikit-learn models.
-model = joblib.load('models/placement_prediction_model.pkl')
+# Set the title and a brief description
+st.title('Student Placement Predictor')
+st.write('Enter the student details to predict their placement status.')
 
-@app.route('/')
-def home():
-    """Renders the main home page with the input form."""
-    return render_template('index.html')
+# Create input widgets for your model's features
+# Customize these to match the features your model was trained on
+st.header('Student Details')
+cgpa = st.slider('CGPA', min_value=0.0, max_value=10.0, value=7.5, step=0.1)
+# Add more input widgets for other features, e.g., 'skills', 'interviews', etc.
+# skills = st.selectbox('Skills', ['Python', 'Java', 'Data Science', 'None'])
+# communication_score = st.number_input('Communication Score', min_value=0, max_value=100)
 
-@app.route('/predict', methods=['POST'])
-def predict():
-    """Handles the prediction request from the UI."""
-    # Get the data from the form
-    data = request.json
-    
-    # Process the data and make a prediction using your model
-    # Note: You'll need to adapt this part to match the features your model expects
-    # Example:
-    features = [[data['feature1'], data['feature2'], ...]]
-    prediction = model.predict(features)[0]
-    
-    # You might also want to predict salary, depending on your model
-    # salary_model = joblib.load('models/salary_prediction_model.pkl')
-    # salary_prediction = salary_model.predict(features)[0]
-    
-    # Return the prediction result as JSON
-    return jsonify({
-        'placement_prediction': 'Placed' if prediction == 1 else 'Not Placed'
-        # 'salary_prediction': salary_prediction
-    })
+# Create a button to trigger the prediction
+if st.button('Predict Placement'):
+    # Prepare the input data for the model
+    # The data must be in the same format as the training data
+    input_data = pd.DataFrame([[cgpa]], columns=['CGPA']) # Replace with your actual feature names
 
-if __name__ == '__main__':
-    app.run(debug=True)
+    # Make a prediction
+    prediction = model.predict(input_data)[0]
+
+    # Display the result
+    st.subheader('Prediction Result')
+    if prediction == 1: # Assuming 1 = Placed
+        st.success('Congratulations! The student is likely to be placed.')
+        
+    else: # Assuming 0 = Not Placed
+        st.warning('The student is likely to be not placed. Consider further training.')
